@@ -37,9 +37,12 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             password: formData.get('password')
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('Status:', response.status); // Mostra lo stato HTTP
+        return response.json();
+    })
     .then(data => {
-        console.log('Risposta dal server:', data); // Aggiungi questo per debug
+        console.log('Risposta dal server:', data); // Mostra la risposta completa
         if (data.user && data.token) {
             localStorage.setItem('token', data.token);
             localStorage.setItem('user_id', data.user.id);
