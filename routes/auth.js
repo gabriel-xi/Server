@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const db = require('../db'); // Importa dal nuovo file db.js
+const db = require('../app'); // Connessione al database
 
 const router = express.Router();
 
