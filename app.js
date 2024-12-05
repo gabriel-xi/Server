@@ -6,64 +6,54 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
 
-// Connessione al database PostgreSQL
-const db = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-});
-
-db.connect()
-    .then(() => console.log('Connesso a PostgreSQL'))
-    .catch((err) => {
-        console.error('Errore connessione:', err);
-        process.exit(1); // Termina il processo in caso di errore
-    });
-
-// Configurazione del server Express
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: '*', // Consenti richieste da tutte le origini (modifica per sicurezza in produzione)
-    },
-});
 
-// Middleware
-app.use(express.json()); // Per parsing JSON
-app.use(cors()); // Abilita il CORS per tutte le origini
-app.use(express.static(path.join(__dirname, './public')));
+// Configurazione CORS più sicura per la produzione
+const corsOptions = {
+    origin: 'https://feelingss.netlify.app', // Sostituisci con l'URL del tuo frontend effettivo
+    methods: ["GET", "POST"], // Metodi HTTP permessi
+    allowedHeaders: ["Content-Type", "Authorization"], // Headers permessi nelle richieste
+    credentials: true, // Consenti l'invio di cookie e header di autenticazione
+    optionsSuccessStatus: 200 // Per browser legacy
+};
+app.use(cors(corsOptions));
 
-// Route per la radice
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Upgrade/public/login.html'));
-});
+// Parsing JSON per le richieste
+app.use(express.json());
 
-// Rotte API
-app.use('/auth', require('./routes/auth')); // Rotte per autenticazione
-app.use('/posts', require('./routes/posts')); // Rotte per i post
-app.use('/friends', require('./routes/friends')); // Rotte per la gestione amici
-app.use('/profile', require('./routes/profile')); // Rotte per la gestione amici
+// Servire file statici dalla cartella 'public'
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Socket.IO per messaggi in tempo reale
+// Socket.IO Configuration
+const io = new Server(server, { cors: corsOptions });
 io.on('connection', (socket) => {
     console.log(`Utente connesso: ${socket.id}`);
-
     socket.on('sendMessage', (data) => {
         console.log('Messaggio ricevuto:', data);
-        io.emit('receiveMessage', data); // Trasmette il messaggio a tutti
+        io.emit('receiveMessage', data);
     });
-
     socket.on('disconnect', () => {
         console.log(`Utente disconnesso: ${socket.id}`);
     });
 });
 
-// Porta su cui avviare il server
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server in esecuzione sulla porta ${PORT}`));
+// Route per la radice, reindirizza alla pagina di login
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
 
-// Esporta il database per l'utilizzo nelle rotte
-module.exports = db;
+// Definizione delle route per le API
+app.use('/auth', require('./routes/auth'));
+app.use('/posts', require('./routes/posts'));
+app.use('/friends', require('./routes/friends'));
+app.use('/profile', require('./routes/profile'));
+
+// Avvio del server sulla porta definita
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server in esecuzione sulla porta ${PORT}`);
+});
+
+// Esporta il modulo per eventuali test o uso esterno
+module.exports = { app, server };
