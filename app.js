@@ -27,7 +27,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'https://feelingss.netlify.app/', // Consenti richieste da tutte le origini (modifica per sicurezza in produzione)
+        origin: '*', // Consenti richieste da tutte le origini (modifica per sicurezza in produzione)
     },
 });
 
@@ -37,9 +37,8 @@ app.use(cors()); // Abilita il CORS per tutte le origini
 app.use(express.static(path.join(__dirname, './public')));
 
 // Route per la radice
-// Route per la radice
 app.get('/', (req, res) => {
-    res.redirect('https://feelingss.netlify.app/');
+    res.sendFile(path.join(__dirname, '../Upgrade/public/login.html'));
 });
 
 // Rotte API
