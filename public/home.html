@@ -209,19 +209,30 @@
         </div>
     </main>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const BASE_URL = 'https://server-xpxp.onrender.com';
-            const postsContainer = document.getElementById('postsContainer');
-            const postForm = document.getElementById('postForm');
-            const submitButton = postForm.querySelector('.btn');
-            const token = localStorage.getItem('token');
-            const userId = localStorage.getItem('user_id');
+       document.addEventListener('DOMContentLoaded', () => {
+    const BASE_URL = 'https://server-xpxp.onrender.com';
+    const postsContainer = document.getElementById('postsContainer');
+    const postForm = document.getElementById('postForm');
+    const submitButton = postForm.querySelector('.btn');
+    const usernameSpan = document.querySelector('.username');
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('user_id');
+    const username = localStorage.getItem('username');
+
 
             if (!token || !userId) {
                 alert('Devi effettuare il login.');
                 window.location.href = 'https://feelingss.netlify.app/login.html';
                 return;
             }
+
+               // Popola il nome utente
+    if (username) {
+        usernameSpan.textContent = username;
+    } else {
+        console.error('Nome utente non trovato in localStorage.');
+    }
+
 
             // Funzione per caricare i post
             function loadPosts() {
