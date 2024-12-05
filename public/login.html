@@ -44,7 +44,6 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     .then(data => {
         console.log('Risposta dal server:', data); // Mostra la risposta completa
         if (data.user && data.token) {
-            localStorage.setItem('token', data.token);
             localStorage.setItem('user_id', data.user.id);
             localStorage.setItem('username', data.user.nome);
             window.location.href = 'https://feelingss.netlify.app/home.html';
