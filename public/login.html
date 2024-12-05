@@ -44,8 +44,9 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     .then(data => {
         console.log('Risposta dal server:', data); // Mostra la risposta completa
         if (data.user && data.token) {
-            localStorage.setItem('user_id', data.user.id);
             localStorage.setItem('username', data.user.nome);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            localStorage.setItem('user_id', data.user.id);
             window.location.href = 'https://feelingss.netlify.app/home.html';
         } else {
             alert(data.error || 'Errore durante il login.');
