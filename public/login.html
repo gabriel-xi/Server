@@ -43,7 +43,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     })
     .then(data => {
         console.log('Risposta dal server:', data); // Mostra la risposta completa
-        if (data.user && data.token) {
+        if (data.user) {
             localStorage.setItem('username', data.user.nome);
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('user_id', data.user.id);
