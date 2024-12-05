@@ -39,7 +39,7 @@ app.use(express.static(path.join(__dirname, './public')));
 // Route per la radice
 // Route per la radice
 app.get('/', (req, res) => {
-    res.redirect('https://feelingss.netlify.app/login');
+    res.redirect('https://feelingss.netlify.app/');
 });
 
 // Rotte API
