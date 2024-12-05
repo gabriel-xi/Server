@@ -50,7 +50,7 @@ app.use('/friends', require('./routes/friends'));
 app.use('/profile', require('./routes/profile'));
 
 // Avvio del server sulla porta definita
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 server.listen(PORT, () => {
     console.log(`Server in esecuzione sulla porta ${PORT}`);
 });
