@@ -1,10 +1,10 @@
-const { Pool } = require('pg');
-require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
+const { Pool } = require('pg');
+require('dotenv').config();
 
 // Connessione al database PostgreSQL
 const db = new Pool({
@@ -19,7 +19,7 @@ db.connect()
     .then(() => console.log('Connesso a PostgreSQL'))
     .catch((err) => {
         console.error('Errore connessione:', err);
-        process.exit(1); // Termina il processo in caso di errore
+        process.exit(1);
     });
 
 // Configurazione del server Express
@@ -27,14 +27,14 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'https://feelingss.netlify.app/', // Consenti richieste da tutte le origini (modifica per sicurezza in produzione)
+        origin: 'https://feelingss.netlify.app', // URL del frontend su Netlify
     },
 });
 
 // Middleware
-app.use(express.json()); // Per parsing JSON
+app.use(express.json());
 app.use(cors({
-    origin: 'https://feelingss.netlify.app', // URL del frontend su Netlify
+    origin: 'https://feelingss.netlify.app', // Consenti richieste solo dal tuo frontend su Netlify
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -64,9 +64,11 @@ io.on('connection', (socket) => {
     });
 });
 
-// Porta su cui avviare il server
+// Porta dinamica per Render
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`Server in esecuzione sulla porta ${PORT}`));
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server in esecuzione sulla porta ${PORT}`);
+});
 
-// Esporta il database per l'utilizzo nelle rotte
+// Esporta il database
 module.exports = db;
