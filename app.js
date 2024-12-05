@@ -33,19 +33,22 @@ const io = new Server(server, {
 
 // Middleware
 app.use(express.json()); // Per parsing JSON
-app.use(cors()); // Abilita il CORS per tutte le origini
-app.use(express.static(path.join(__dirname, './public')));
+app.use(cors({
+    origin: 'https://feelingss.netlify.app', // URL del frontend su Netlify
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 // Route per la radice
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../Upgrade/public/login.html'));
+    res.redirect('https://feelingss.netlify.app/login');
 });
 
 // Rotte API
 app.use('/auth', require('./routes/auth')); // Rotte per autenticazione
 app.use('/posts', require('./routes/posts')); // Rotte per i post
 app.use('/friends', require('./routes/friends')); // Rotte per la gestione amici
-app.use('/profile', require('./routes/profile')); // Rotte per la gestione amici
+app.use('/profile', require('./routes/profile')); // Rotte per i profili
 
 // Socket.IO per messaggi in tempo reale
 io.on('connection', (socket) => {
