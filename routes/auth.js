@@ -1,4 +1,3 @@
-// Login
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -7,33 +6,20 @@ const router = express.Router();
 
 // Registrazione
 router.post('/register', async (req, res) => {
-    const { username, nome, cognome, email, password, user_type } = req.body;
+    const { username, nome, cognome, email, password } = req.body;
 
     try {
-        const checkUser = await db.query(
-            'SELECT * FROM Users WHERE email = $1 OR username = $2',
-            [email, username]
-        );
-
-        if (checkUser.rows.length > 0) {
-            return res.status(400).json({ error: 'Email o username già registrati.' });
-        }
-
         const hashedPassword = await bcrypt.hash(password, 10);
-        const userType = user_type || 1;
-
-        await db.query(
-            'INSERT INTO Users (username, nome, cognome, email, passw, user_type) VALUES ($1, $2, $3, $4, $5, $6)',
-            [username, nome, cognome, email, hashedPassword, userType]
+        const result = await db.query(
+            'INSERT INTO Users (username, nome, cognome, email, passw) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+            [username, nome, cognome, email, hashedPassword]
         );
-
-        res.status(201).json({ success: 'Utente creato!' });
+        res.status(201).json({ userId: result.rows[0].id });
     } catch (err) {
         console.error('Errore durante la registrazione:', err);
-        res.status(500).json({ error: 'Errore durante la registrazione.' });
+        res.status(500).json({ error: 'Errore interno del server.' });
     }
 });
-
 
 // Login
 router.post('/login', async (req, res) => {
@@ -42,17 +28,16 @@ router.post('/login', async (req, res) => {
     try {
         const result = await db.query('SELECT * FROM Users WHERE email = $1', [email]);
         if (result.rows.length === 0) {
-            return res.status(401).json({ error: 'Email o password non validi.' });
+            return res.status(401).json({ error: 'Credenziali non valide.' });
         }
 
         const user = result.rows[0];
         const isMatch = await bcrypt.compare(password, user.passw);
 
         if (!isMatch) {
-            return res.status(401).json({ error: 'Email o password non validi.' });
+            return res.status(401).json({ error: 'Credenziali non valide.' });
         }
 
-        // Genera un token JWT
         const token = jwt.sign(
             { id: user.id, email: user.email },
             process.env.JWT_SECRET,
