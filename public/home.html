@@ -218,13 +218,13 @@
 </head>
 <body>
     <header>
-        <a href="/home.html" class="logo">F</a>
+        <a href="https://feelingss.netlify.app/home.html" class="logo">F</a>
         <div class="menu">
             <div class="hamburger">
                 <span class="username logo"></span>
                 <div class="dropdown">
-                    <a href="/friends.html">Amici</a>
-                    <a href="/login.html">Logout</a>
+                    <a href="https://feelingss.netlify.app/friends.html">Amici</a>
+                    <a href="https://feelingss.netlify.app/login.html">Logout</a>
                 </div>
             </div>
         </div>
@@ -350,7 +350,7 @@ postForm.addEventListener('submit', (e) => {
     submitButton.classList.add('loading');
 
     const formData = new FormData(postForm);
-    fetch('/posts', {
+    fetch('https://server-xpxp.onrender.com/posts', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
