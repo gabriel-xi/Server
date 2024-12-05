@@ -39,13 +39,11 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Risposta dal server:', data); // Aggiungi questo per debug
         if (data.user && data.token) {
-            // Salva i dati nel localStorage
             localStorage.setItem('token', data.token);
             localStorage.setItem('user_id', data.user.id);
             localStorage.setItem('username', data.user.nome);
-
-            // Reindirizza alla home
             window.location.href = 'https://feelingss.netlify.app/home.html';
         } else {
             alert(data.error || 'Errore durante il login.');
