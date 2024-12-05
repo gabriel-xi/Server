@@ -1,34 +1,32 @@
 const express = require('express');
+const http = require('http');
 const cors = require('cors');
-const path = require('path');
-const db = require('./db');
+const { Pool } = require('pg');
 require('dotenv').config();
 
 const app = express();
+const server = http.createServer(app);
 
-// Middleware
-app.use(express.json());
+// Configura middleware
 app.use(cors({
-    origin: 'https://feelingss.netlify.app', // URL del frontend su Netlify
+    origin: 'https://feelingss.netlify.app/login', // Modifica in produzione con l'URL del frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+app.use(express.json());
 
-// Rotte
-app.use('/auth', require('./auth')); // Rotte per autenticazione
-app.use('/posts', require('./posts')); // Rotte per i post
-app.use('/friends', require('./friends')); // Rotte per gestione amici
-app.use('/profile', require('./profile')); // Rotte per gestione profili
+// Importa le rotte
+app.use('/auth', require('./auth'));
+app.use('/posts', require('./posts'));
+app.use('/friends', require('./friends'));
 
-// Reindirizzamento alla homepage del frontend
+// Rotta base per test
 app.get('/', (req, res) => {
-    res.redirect('https://feelingss.netlify.app/login');
+    res.send('Server backend è operativo!');
 });
 
-// Porta per il server
+// Configura porta per Render
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server in esecuzione sulla porta ${PORT}`);
 });
-
-module.exports = app;
