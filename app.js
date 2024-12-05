@@ -27,7 +27,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: 'https://feelingss.netlify.app', // Consenti richieste da tutte le origini (modifica per sicurezza in produzione)
+        origin: 'https://feelingss.netlify.app/login', // Consenti richieste da tutte le origini (modifica per sicurezza in produzione)
     },
 });
 
