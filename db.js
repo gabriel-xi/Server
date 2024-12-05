@@ -12,8 +12,8 @@ const db = new Pool({
 db.connect()
     .then(() => console.log('Connesso a PostgreSQL'))
     .catch(err => {
-        console.error('Errore nella connessione al database:', err);
+        console.error('Errore di connessione a PostgreSQL:', err);
         process.exit(1);
     });
 
-module.exports = db;
+module.exports = db; // Esporta l'istanza corretta
