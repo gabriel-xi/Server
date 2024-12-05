@@ -1,5 +1,5 @@
 const express = require('express');
-const db = require('../db'); // Importa la connessione al database
+const db = require('./db');
 
 const router = express.Router();
 
