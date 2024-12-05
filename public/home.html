@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <title>Home - Feelings</title>
     <style>
-        
         body {
             font-family: Arial, sans-serif;
             background-color:linear-gradient(to right, #fa709a, #fee140);
@@ -105,7 +104,6 @@
             border-radius: 5px;
         }
 
-        
         .btn {
             background: linear-gradient(to right, #fa709a, #fee140);
             color: white;
@@ -120,29 +118,9 @@
             transition: all 0.3s ease-in-out;
         }
 
-        .btn:after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 100%; 
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to right, #fa709a, #fee140);
-            z-index: 0;
-            transition: right 1s ease-in-out; 
-        }
-
         .btn span {
             position: relative;
             z-index: 1;
-        }
-
-        .btn.loading:after {
-            right: 0; 
-        }
-
-        .btn.loading {
-            color: white;
         }
 
         .posts-container {
@@ -153,28 +131,28 @@
         }
 
         .card {
-    background: transparent;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+            background: transparent;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-.card.loaded {
-    opacity: 1;
-    transform: translateY(0);
-}
+        .card.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-.card:hover {
-    transform: translateY(-5px); 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
-}
+        .card:hover {
+            transform: translateY(-5px); 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+        }
 
         .card .info {
             flex: 1;
@@ -198,23 +176,7 @@
             margin: 10px 0;
             color: #333;
         }
-
-        .reactions img {
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-        }
-        .animate {
-            transition: all 0.3s ease;
-            transform: scale(1.05); 
-        }
-
-        .like-btn.liked {
-    color: #ff4500;
-    font-weight: bold;
-}
-
-</style>
+    </style>
 </head>
 <body>
     <header>
@@ -235,10 +197,10 @@
                 <h2>Scrivi</h2>
                 <form id="postForm">
                     <div class="input-group">
-                        <input type="text" name="sentimento"  placeholder="Come va?" required>
+                        <input type="text" name="sentimento" placeholder="Come va?" required>
                     </div>
                     <div class="input-group">
-                        <strong><textarea name="note" placeholder="Racconta un po'" required></textarea></strong>
+                        <textarea name="note" placeholder="Racconta un po'" required></textarea>
                     </div>
                     <button type="submit" class="btn"><span>Pubblica</span></button>
                 </form>
@@ -247,136 +209,135 @@
         </div>
     </main>
     <script>
-    
-document.addEventListener('DOMContentLoaded', () => {
-    const BASE_URL = 'https://server-xpxp.onrender.com';
-    const postsContainer = document.getElementById('postsContainer');
-    const postForm = document.getElementById('postForm');
-    const submitButton = postForm.querySelector('.btn');
-    const userId = localStorage.getItem('user_id');
+        document.addEventListener('DOMContentLoaded', () => {
+            const BASE_URL = 'https://server-xpxp.onrender.com';
+            const postsContainer = document.getElementById('postsContainer');
+            const postForm = document.getElementById('postForm');
+            const submitButton = postForm.querySelector('.btn');
+            const token = localStorage.getItem('token');
+            const userId = localStorage.getItem('user_id');
 
+            if (!token || !userId) {
+                alert('Devi effettuare il login.');
+                window.location.href = 'https://feelingss.netlify.app/login.html';
+                return;
+            }
 
-function loadPosts() {
-    fetch(`/posts?userId=${userId}`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    })
-    .then(res => {
-        if (!res.ok) throw new Error('Errore nel caricamento dei post');
-        return res.json();
-    })
-    .then(posts => {
-        postsContainer.innerHTML = posts.map(post => `
-            <div class="card">
-                <div class="info">
-                    <h3>${post.username}</h3>
-                    <small>${new Date(post.created_at).toLocaleString()}</small>
-                    <p>Mi sento: ${post.sentimento}</p>
-                    <p>Ti spiego: ${post.note}</p>
-                    <p>Mi piace: ${post.reazioni || 0}</p>
-                </div>
+            // Funzione per caricare i post
+            function loadPosts() {
+                fetch(`${BASE_URL}/posts?userId=${userId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Errore nel caricamento dei post');
+                    return res.json();
+                })
+                .then(posts => {
+                    postsContainer.innerHTML = posts.map(post => `
+                        <div class="card">
+                            <div class="info">
+                                <h3>${post.username}</h3>
+                                <small>${new Date(post.created_at).toLocaleString()}</small>
+                                <p>Mi sento: ${post.sentimento}</p>
+                                <p>Ti spiego: ${post.note}</p>
+                                <p>Mi piace: ${post.reazioni || 0}</p>
+                            </div>
                             <button class="like-btn ${post.is_liked ? 'liked' : ''}" data-id="${post.id}">
-                ${post.is_liked ? '👎 Non mi piace' : '👍 Mi piace'}
-                </button>
-                ${post.is_owner ? `<button class="delete-btn" data-id="${post.id}">🗑️ Elimina</button>` : ''}
-            </div>
-        `).join('');
-        setTimeout(() => {
-            document.querySelectorAll('.card').forEach(card => card.classList.add('loaded'));
-        }, 100);
-    })
-    .catch(err => {
-        console.error('Errore nel caricamento dei post:', err);
-    });
-}
-
-
-postsContainer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('like-btn')) {
-        const postId = e.target.getAttribute('data-id');
-        const isLiked = e.target.classList.contains('liked');
-        const action = isLiked ? 'unlike' : 'like';
-
-        fetch(`/posts/${postId}/reazioni`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ action })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-
-                e.target.classList.toggle('liked');
-                e.target.textContent = e.target.classList.contains('liked') ? '👎 Non mi piace' : '👍 Mi piace';
-                e.target.closest('.card').querySelector('.info p:last-child').textContent = `Mi piace: ${data.reazioni}`;;
-                
+                                ${post.is_liked ? '👎 Non mi piace' : '👍 Mi piace'}
+                            </button>
+                            ${post.is_owner ? `<button class="delete-btn" data-id="${post.id}">🗑️ Elimina</button>` : ''}
+                        </div>
+                    `).join('');
+                    setTimeout(() => {
+                        document.querySelectorAll('.card').forEach(card => card.classList.add('loaded'));
+                    }, 100);
+                })
+                .catch(err => {
+                    console.error('Errore nel caricamento dei post:', err);
+                });
             }
-        })
-        .catch(err => console.error('Errore nella gestione del "mi piace":', err));
-    }
-});
 
+            // Gestione del click su "Mi Piace" e "Elimina"
+            postsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('like-btn')) {
+                    const postId = e.target.getAttribute('data-id');
+                    const action = e.target.classList.contains('liked') ? 'unlike' : 'like';
 
-postsContainer.addEventListener('click', (e) => {
-    if (e.target.classList.contains('delete-btn')) {
-        const postId = e.target.getAttribute('data-id');
+                    fetch(`${BASE_URL}/posts/${postId}/reazioni`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ action })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadPosts();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Errore nella gestione del "mi piace":', err);
+                    });
+                }
 
-        fetch(`/posts/${postId}?userId=${localStorage.getItem('user_id')}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                e.target.closest('.card').remove();
-            }
-        })
-        .catch(err => console.error('Errore nella cancellazione del post:', err));
-    }
-});
+                if (e.target.classList.contains('delete-btn')) {
+                    const postId = e.target.getAttribute('data-id');
 
+                    fetch(`${BASE_URL}/posts/${postId}?userId=${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadPosts();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Errore nella cancellazione del post:', err);
+                    });
+                }
+            });
 
-postForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    submitButton.classList.add('loading');
+            // Gestione della pubblicazione di un post
+            postForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitButton.classList.add('loading');
+                const formData = new FormData(postForm);
 
-    const formData = new FormData(postForm);
-    fetch('https://server-xpxp.onrender.com/posts', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify({
-            id_user: userId,
-            sentimento: formData.get('sentimento'),
-            note: formData.get('note')
-        })
-    })
-    .then(response => {
-        if (!response.ok) throw new Error('Errore nella creazione del post');
-        return response.json();
-    })
-    .then(() => {
-        setTimeout(() => {
-            submitButton.classList.remove('loading');
-            postForm.reset();
+                fetch(`${BASE_URL}/posts`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        id_user: userId,
+                        sentimento: formData.get('sentimento'),
+                        note: formData.get('note')
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Errore nella creazione del post');
+                    return response.json();
+                })
+                .then(() => {
+                    submitButton.classList.remove('loading');
+                    postForm.reset();
+                    loadPosts();
+                })
+                .catch(err => {
+                    submitButton.classList.remove('loading');
+                    console.error('Errore durante la creazione del post:', err);
+                });
+            });
+
             loadPosts();
-        }, 1000);
-    })
-    .catch(err => {
-        submitButton.classList.remove('loading');
-        console.error('Errore durante la creazione del post:', err);
-    });
-});
-
-
-loadPosts();
-});
+        });
     </script>
 </body>
 </html>
