@@ -37,17 +37,13 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             password: formData.get('password')
         })
     })
-    .then(response => {
-        console.log('Status:', response.status); // Mostra lo stato HTTP
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('Risposta dal server:', data); // Mostra la risposta completa
+        console.log('Risposta dal server:', data);
         if (data.user) {
-            localStorage.setItem('username', data.user.nome);
-            localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('user_id', data.user.id);
-            window.location.href = 'https://feelingss.netlify.app/home';
+            localStorage.setItem('username', data.user.nome);
+            window.location.href = 'https://feelingss.netlify.app/home.html';
         } else {
             alert(data.error || 'Errore durante il login.');
         }
