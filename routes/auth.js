@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const db = require('./db');
 const router = express.Router();
 
+
 // Registrazione
 router.post('/register', async (req, res) => {
     const { username, nome, cognome, email, password } = req.body;
@@ -20,6 +21,7 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Errore interno del server.' });
     }
 });
+
 
 // Login
 router.post('/login', async (req, res) => {
