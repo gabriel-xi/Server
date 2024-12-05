@@ -1,6 +1,5 @@
 const express = require('express');
 const db = require('./db');
-
 const router = express.Router();
 
 // Crea un nuovo post
@@ -24,40 +23,45 @@ router.post('/', async (req, res) => {
 });
 
 
-// Ottieni tutti i post
-router.get('/', async (req, res) => {
-    const userId = req.query.userId;
-
-    if (!userId) {
-        return res.status(400).json({ error: 'userId è obbligatorio.' });
-    }
-
-    const query = `
-        SELECT 
-            Post.id, 
-            Post.id_user,
-            Post.sentimento, 
-            Post.note, 
-            Post.reazioni,
-            Post.commenti,
-            Users.username, 
-            Post.created_at   
-        FROM Post
-        JOIN Users ON Post.id_user = Users.id
-        WHERE Post.id_user = $1 OR Post.id_user IN (
-            SELECT friend_id FROM Friends WHERE user_id = $2
-        )
-        ORDER BY Post.created_at DESC
-    `;
+// Crea un nuovo post
+router.post('/', async (req, res) => {
+    const { id_user, sentimento, note } = req.body;
 
     try {
-        const result = await db.query(query, [userId, userId]);
-        res.status(200).json(result.rows);
+        const result = await db.query(
+            'INSERT INTO Post (id_user, sentimento, note, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id',
+            [id_user, sentimento, note || null]
+        );
+        res.status(201).json({ postId: result.rows[0].id });
     } catch (err) {
-        console.error('Errore query SELECT:', err);
-        res.status(500).json({ error: 'Errore nel recupero dei post.' });
+        console.error('Errore nella creazione del post:', err);
+        res.status(500).json({ error: 'Errore interno del server.' });
     }
 });
+
+// Ottieni i post
+router.get('/', async (req, res) => {
+    const { userId } = req.query;
+
+    try {
+        const result = await db.query(`
+            SELECT Post.*, Users.username
+            FROM Post
+            JOIN Users ON Post.id_user = Users.id
+            WHERE Post.id_user = $1 OR Post.id_user IN (
+                SELECT friend_id FROM Friends WHERE user_id = $1
+            )
+            ORDER BY Post.created_at DESC
+        `, [userId]);
+
+        res.status(200).json(result.rows);
+    } catch (err) {
+        console.error('Errore nel caricamento dei post:', err);
+        res.status(500).json({ error: 'Errore interno del server.' });
+    }
+});
+
+
 
 // Elimina un post
 router.delete('/:id', async (req, res) => {
