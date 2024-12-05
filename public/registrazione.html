@@ -42,17 +42,17 @@
     messageBox.textContent = '';
     messageBox.style.color = '';
 
-    fetch('/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            username: formData.get('username'),
-            nome: formData.get('nome'),
-            cognome: formData.get('cognome'),
-            email: formData.get('email'),
-            password: formData.get('password')
-        })
+fetch('https://server-xpxp.onrender.com/auth/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        username: formData.get('username'),
+        nome: formData.get('nome'),
+        cognome: formData.get('cognome'),
+        email: formData.get('email'),
+        password: formData.get('password')
     })
+})
     .then(response => response.json())
     .then(data => {
         if (data.success) {
