@@ -1,74 +1,34 @@
 const express = require('express');
-const http = require('http');
-const { Server } = require('socket.io');
 const cors = require('cors');
 const path = require('path');
-const { Pool } = require('pg');
+const db = require('./db');
 require('dotenv').config();
 
-// Connessione al database PostgreSQL
-const db = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-});
-
-db.connect()
-    .then(() => console.log('Connesso a PostgreSQL'))
-    .catch((err) => {
-        console.error('Errore connessione:', err);
-        process.exit(1);
-    });
-
-// Configurazione del server Express
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server, {
-    cors: {
-        origin: 'https://feelingss.netlify.app', // URL del frontend su Netlify
-    },
-});
 
 // Middleware
 app.use(express.json());
 app.use(cors({
-    origin: 'https://feelingss.netlify.app', // Consenti richieste solo dal tuo frontend su Netlify
+    origin: 'https://feelingss.netlify.app', // URL del frontend su Netlify
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Route per la radice
+// Rotte
+app.use('/auth', require('./auth')); // Rotte per autenticazione
+app.use('/posts', require('./posts')); // Rotte per i post
+app.use('/friends', require('./friends')); // Rotte per gestione amici
+app.use('/profile', require('./profile')); // Rotte per gestione profili
+
+// Reindirizzamento alla homepage del frontend
 app.get('/', (req, res) => {
     res.redirect('https://feelingss.netlify.app/login');
 });
 
-// Rotte API
-app.use('/auth', require('./routes/auth')); // Rotte per autenticazione
-app.use('/posts', require('./routes/posts')); // Rotte per i post
-app.use('/friends', require('./routes/friends')); // Rotte per la gestione amici
-app.use('/profile', require('./routes/profile')); // Rotte per i profili
-
-// Socket.IO per messaggi in tempo reale
-io.on('connection', (socket) => {
-    console.log(`Utente connesso: ${socket.id}`);
-
-    socket.on('sendMessage', (data) => {
-        console.log('Messaggio ricevuto:', data);
-        io.emit('receiveMessage', data); // Trasmette il messaggio a tutti
-    });
-
-    socket.on('disconnect', () => {
-        console.log(`Utente disconnesso: ${socket.id}`);
-    });
-});
-
-// Porta dinamica per Render
+// Porta per il server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, () => {
     console.log(`Server in esecuzione sulla porta ${PORT}`);
 });
 
-// Esporta il database
-module.exports = db;
+module.exports = app;
