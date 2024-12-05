@@ -1,19 +1,13 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
-const db = require('../db'); // Importa dal nuovo file db.js
-
+const db = require('../db');
 const router = express.Router();
 
-// Registrazione
 router.post('/register', async (req, res) => {
     const { username, nome, cognome, email, password, user_type } = req.body;
 
     try {
-        const checkUser = await db.query(
-            'SELECT * FROM Users WHERE email = $1 OR username = $2',
-            [email, username]
-        );
-
+        const checkUser = await db.query('SELECT * FROM Users WHERE email = $1 OR username = $2', [email, username]);
         if (checkUser.rows.length > 0) {
             return res.status(400).json({ error: 'Email o username già registrati.' });
         }
@@ -33,7 +27,6 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// Login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
