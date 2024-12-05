@@ -24,13 +24,15 @@
     </div>
 
     <script>
+<script>
 document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
     const formData = new FormData(this);
     const errorMessageDiv = document.getElementById('error-message');
     errorMessageDiv.textContent = ''; // Resetta il messaggio di errore
 
-    fetch('/auth/login', {
+    // Modifica l'URL nel fetch per puntare al tuo server
+    fetch('https://server-xpxp.onrender.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -45,7 +47,7 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
             localStorage.setItem('username', data.user.nome);
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('user_id', data.user.id);
-            window.location.href = '/home.html';
+            window.location.href = '/home.html'; // Assicurati che questo percorso sia corretto
         } else {
             errorMessageDiv.textContent = data.error || 'Errore durante il login.';
             errorMessageDiv.style.color = 'red';
@@ -56,5 +58,5 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
         errorMessageDiv.style.color = 'red';
     });
 });
-    </script>
+</script>
 </body>
