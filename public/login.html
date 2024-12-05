@@ -23,16 +23,13 @@
         </div>
     </div>
 
-    <script>
 <script>
 document.getElementById('loginForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    const BASE_URL = 'https://server-xpxp.onrender.com';
     const formData = new FormData(this);
-    const errorMessageDiv = document.getElementById('error-message');
-    errorMessageDiv.textContent = ''; // Resetta il messaggio di errore
 
-    // Modifica l'URL nel fetch per puntare al tuo server
-    fetch('https://server-xpxp.onrender.com/auth/login', {
+    fetch(`${BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -43,19 +40,12 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     .then(response => response.json())
     .then(data => {
         if (data.user) {
-            // Salva i dati utente nel localStorage
             localStorage.setItem('username', data.user.nome);
-            localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('user_id', data.user.id);
-            window.location.href = 'https://feelingss.netlify.app/home'; // Assicurati che questo percorso sia corretto
+            window.location.href = 'https://feelingss.netlify.app/home';
         } else {
-            errorMessageDiv.textContent = data.error || 'Errore durante il login.';
-            errorMessageDiv.style.color = 'red';
+            alert(data.error);
         }
-    })
-    .catch(err => {
-        errorMessageDiv.textContent = 'Errore di connessione al server.';
-        errorMessageDiv.style.color = 'red';
     });
 });
 </script>
