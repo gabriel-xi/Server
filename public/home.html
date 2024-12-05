@@ -248,17 +248,12 @@
     </main>
     <script>
     
-    document.addEventListener('DOMContentLoaded', () => {
-
-
-const usernameSpan = document.querySelector('.username');
-const username = localStorage.getItem('username');
-usernameSpan.textContent = username;
-
-const postsContainer = document.getElementById('postsContainer');
-const postForm = document.getElementById('postForm');
-const submitButton = postForm.querySelector('.btn');
-const userId = localStorage.getItem('user_id');
+document.addEventListener('DOMContentLoaded', () => {
+    const BASE_URL = 'https://server-xpxp.onrender.com';
+    const postsContainer = document.getElementById('postsContainer');
+    const postForm = document.getElementById('postForm');
+    const submitButton = postForm.querySelector('.btn');
+    const userId = localStorage.getItem('user_id');
 
 
 function loadPosts() {
