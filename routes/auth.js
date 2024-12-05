@@ -1,6 +1,6 @@
 const express = require('express');
+const db = require('./db');
 const bcrypt = require('bcryptjs');
-const db = require('../app'); // Connessione al database
 
 const router = express.Router();
 
@@ -33,6 +33,8 @@ router.post('/register', async (req, res) => {
     }
 });
 
+
+
 // Login
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -40,22 +42,20 @@ router.post('/login', async (req, res) => {
     try {
         const result = await db.query('SELECT * FROM Users WHERE email = $1', [email]);
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'E-mail non trovata!' });
+            return res.status(401).json({ error: 'Email o password non validi' });
         }
 
         const user = result.rows[0];
         const isMatch = await bcrypt.compare(password, user.passw);
+
         if (!isMatch) {
-            return res.status(400).json({ error: 'Password errata!' });
+            return res.status(401).json({ error: 'Email o password non validi' });
         }
 
-        res.status(200).json({
-            success: 'Login effettuato con successo',
-            user: { id: user.id, username: user.username, email: user.email, nome: user.nome },
-        });
+        res.status(200).json({ user });
     } catch (err) {
         console.error('Errore durante il login:', err);
-        res.status(500).json({ error: 'Errore durante il login.' });
+        res.status(500).json({ error: 'Errore interno del server' });
     }
 });
 
